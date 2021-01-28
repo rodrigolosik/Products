@@ -1,0 +1,81 @@
+﻿@model List<Products.Models.Product>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <a class="btn btn-outline-primary" asp-action="New" asp-controller="Products">Add new</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Provider</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        <tr>
+                            <td>@product.Id</td>
+                            <td>@product.Name</td>
+                            <td>@string.Format("{0:C}",product.Price) </td>
+                            <td>@product.Quantity</td>
+                            <td>@product.Provider</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a class="btn btn-sm btn-warning" asp-action="Update" asp-controller="Products" asp-route-id="@product.Id">Edit</a>
+                                    <button class="btn btn-sm btn-danger" onclick="product.Remove(@product.Id)" type="button">Remove</button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>TOTAL</td>
+                        <td>&nbsp;</td>
+                        <td>@string.Format("{0:C}", Model.Sum(p => p.Price))</td>
+                        <td>@Model.Sum(p => p.Quantity)</td>
+                    </tr>
+                </tfoot>
+
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        var product;
+        class Product {
+            constructor() { }
+            Remove(id) {
+                $.ajax({
+                    type: "POST",
+                    url: `Products/Delete/${id}`,
+                    success: function (data) {
+                        window.alert(data);
+                        setTimeout(function () {
+                            location.reload();
+                        }, 1000);
+                    },
+                    error: function (err) {
+                        window.alert(err);
+                        console.error(err);
+                    }
+                });
+            }
+        }
+
+        $(document).ready(function () {
+            product = new Product();
+        });
+    </script>
+}
